@@ -32,9 +32,9 @@ locals {
             EOT
             admin_password = "CHANGE_ME"
         }
-        vm1 = { 
-            admin_password  = "CHANGE_ME"
-        }
+        # vm1 = { 
+        #     admin_password  = "CHANGE_ME"
+        # }
     }
 
     pubilc_ip = {
