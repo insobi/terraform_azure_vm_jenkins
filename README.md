@@ -1,4 +1,4 @@
-# Terraform Azure VM for Jenkins
+# Deploying Jenkins on Azure VM using Terraform
 This repository include terraform script for deploying Jenkins on Azure.
 
 # How to run
