@@ -141,7 +141,7 @@ resource "azurerm_network_security_rule" "nsg_rule_8080" {
 resource "azurerm_network_security_rule" "nsg_rule_ssh" {
     depends_on                  = [azurerm_network_security_group.nsg]
     name                        = "ssh"
-    priority                    = 100
+    priority                    = 200
     direction                   = "Inbound"
     access                      = "Allow"
     protocol                    = "Tcp"
