@@ -30,11 +30,9 @@ locals {
             - apt-get update && apt-get install jenkins -y
             - service jenkins restart
             EOT
+            admin_name     = "azureuser"
             admin_password = "CHANGE_ME"
         }
-        # vm1 = { 
-        #     admin_password  = "CHANGE_ME"
-        # }
     }
 
     pubilc_ip = {
@@ -67,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     resource_group_name     = azurerm_resource_group.rg.name
     location                = azurerm_resource_group.rg.location
     size                    = "Standard_B1s"
-    admin_username          = "azureuser"
+    admin_username          = each.value.admin_name
     network_interface_ids   = [ contains(keys(azurerm_network_interface.nic), each.key) ? azurerm_network_interface.nic[each.key].id : null ]
 
     admin_password          = each.value.admin_password
