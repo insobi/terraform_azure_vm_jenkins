@@ -122,8 +122,8 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_8080" {
-    depends_on                  = [azurerm_network_security_group.nsg]
-    name                        = "http_8080"
+    for_each                    = local.vm
+    name                        = format("%s_8080", each.key)
     priority                    = 100
     direction                   = "Inbound"
     access                      = "Allow"
@@ -133,12 +133,12 @@ resource "azurerm_network_security_rule" "nsg_rule_8080" {
     source_address_prefix       = "*"
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
-    network_security_group_name = "jenkins-nsg"
+    network_security_group_name = format("%s-nsg", each.key)
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_ssh" {
-    depends_on                  = [azurerm_network_security_group.nsg]
-    name                        = "ssh"
+    for_each                    = local.vm
+    name                        = format("%s_ssh", each.key)
     priority                    = 200
     direction                   = "Inbound"
     access                      = "Allow"
@@ -148,5 +148,5 @@ resource "azurerm_network_security_rule" "nsg_rule_ssh" {
     source_address_prefix       = "*"
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
-    network_security_group_name = "jenkins-nsg"
+    network_security_group_name = format("%s-nsg", each.key)
 }
