@@ -1,2 +1,5 @@
 /.DS_Store
 /.terraform
+terraform.tfstate*
+.terraform*
+
