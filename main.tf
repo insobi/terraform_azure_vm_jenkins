@@ -32,6 +32,7 @@ locals {
             EOT
             admin_name     = "azureuser"
             admin_password = "CHANGE_ME"
+            size           = "Standard_B4ms"
         }
     }
 
@@ -64,7 +65,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     name                    = format("%s-vm", each.key)
     resource_group_name     = azurerm_resource_group.rg.name
     location                = azurerm_resource_group.rg.location
-    size                    = "Standard_B1s"
+    size                    = contains(keys(each.value), "size") ? each.value.size : "Standard_B1s"
     admin_username          = each.value.admin_name
     network_interface_ids   = [ contains(keys(azurerm_network_interface.nic), each.key) ? azurerm_network_interface.nic[each.key].id : null ]
 
@@ -102,7 +103,7 @@ resource "azurerm_network_interface" "nic" {
 
 resource "azurerm_public_ip" "pip" {
     for_each            = local.pubilc_ip
-    name                = format("%s-pip", each.key)
+    name                = format("%s-pip", each.value.name)
     resource_group_name = azurerm_resource_group.rg.name
     location            = azurerm_resource_group.rg.location
     allocation_method   = "Dynamic"
@@ -122,6 +123,7 @@ resource "azurerm_network_interface_security_group_association" "nsg_association
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_8080" {
+    depends_on                  = [azurerm_network_security_group.nsg]
     for_each                    = local.vm
     name                        = format("%s_8080", each.key)
     priority                    = 100
@@ -137,6 +139,7 @@ resource "azurerm_network_security_rule" "nsg_rule_8080" {
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_http" {
+    depends_on                  = [azurerm_network_security_group.nsg]
     for_each                    = local.vm
     name                        = format("%s_http", each.key)
     priority                    = 150
@@ -152,6 +155,7 @@ resource "azurerm_network_security_rule" "nsg_rule_http" {
 }
 
 resource "azurerm_network_security_rule" "nsg_rule_ssh" {
+    depends_on                  = [azurerm_network_security_group.nsg]
     for_each                    = local.vm
     name                        = format("%s_ssh", each.key)
     priority                    = 200
@@ -164,4 +168,8 @@ resource "azurerm_network_security_rule" "nsg_rule_ssh" {
     destination_address_prefix  = "*"
     resource_group_name         = azurerm_resource_group.rg.name
     network_security_group_name = format("%s-nsg", each.key)
+}
+
+output "public_ip" {
+    value = [for pip in azurerm_public_ip.pip: pip.ip_address]
 }
