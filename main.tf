@@ -20,6 +20,7 @@ locals {
     
     vm = {
         jenkins = { 
+            name        = "jenkins"
             cloud-init  = <<EOT
             #cloud-config
             package_upgrade: true
@@ -33,11 +34,8 @@ locals {
             admin_name     = "azureuser"
             admin_password = "CHANGE_ME"
             size           = "Standard_B4ms"
+            public_ip      = true
         }
-    }
-
-    pubilc_ip = {
-        jenkins = { name = "jenkins" }
     }
 }
 
@@ -102,7 +100,7 @@ resource "azurerm_network_interface" "nic" {
 }
 
 resource "azurerm_public_ip" "pip" {
-    for_each            = local.pubilc_ip
+    for_each            = { for item in local.vm : item.name => item if item.public_ip == true }
     name                = format("%s-pip", each.value.name)
     resource_group_name = azurerm_resource_group.rg.name
     location            = azurerm_resource_group.rg.location
